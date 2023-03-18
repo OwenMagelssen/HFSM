@@ -1,0 +1,11 @@
+{
+    "name": "com.oni.hfsm",
+    "version": "0.0.1-preview.1",
+    "displayName": "Hierarchical Finite State Machine",
+    "description": "A minimalist base for making hierarchical finite state machines in Unity.",
+    "author": {
+        "name": "Owen Magelssen",
+        "email": "owen.magelssen@gmail.com",
+        "url": "https://opticnerveinteractive.com"
+    }
+}
