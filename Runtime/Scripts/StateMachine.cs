@@ -25,6 +25,7 @@ namespace HFSM
 
 		public void SetState(State state)
 		{
+			if (state == CurrentState) return;
 			var formerState = CurrentState;
 			formerState?.OnExit(state);
 			CurrentState = state;

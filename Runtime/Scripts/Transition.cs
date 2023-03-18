@@ -3,6 +3,8 @@
  * https://opticnerveinteractive.com
  ******************************************************************/
 
+using System;
+
 namespace HFSM
 {
     public abstract class Transition
@@ -15,5 +17,17 @@ namespace HFSM
 	    }
 	    
 	    public abstract bool TryTransition();
+    }
+
+    public class ConditionTransition : Transition
+    {
+	    private readonly Func<bool> _condition;
+	    
+	    public ConditionTransition(State transitionTo, Func<bool> condition) : base(transitionTo)
+	    {
+		    _condition = condition;
+	    }
+
+	    public override bool TryTransition() => _condition();
     }
 }
