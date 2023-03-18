@@ -59,21 +59,21 @@ namespace HFSM
 			{
 				if (ParentStateMachine.TryToTransition()) 
 					return true;
+				
+				for (int i = 0; i < Transitions.Count; i++)
+				{
+					var transition = Transitions[i];
+					if (transition.TryTransition())
+					{
+						ParentStateMachine.SetState(transition.ToState);
+						return true;
+					}
+				}
 			}
 			
 			for (int i = 0; i < GlobalTransitions.Count; i++)
 			{
 				var transition = GlobalTransitions[i];
-				if (transition.TryTransition())
-				{
-					SetState(transition.ToState);
-					return true;
-				}
-			}
-
-			for (int i = 0; i < Transitions.Count; i++)
-			{
-				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
 					SetState(transition.ToState);
