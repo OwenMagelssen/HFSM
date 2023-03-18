@@ -21,7 +21,7 @@ namespace HFSM
 
 		public void SetDefaultState(State defaultState) => DefaultState = defaultState;
 
-		public void AddGlobalTransition(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
+		public void AddGlobalTransitions(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
 
 		public void SetState(State state)
 		{

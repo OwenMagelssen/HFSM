@@ -17,7 +17,7 @@ namespace HFSM
 			ParentStateMachine = parentParentStateMachine;
 		}
 
-		public void AddTransition(params Transition[] transitions) => Transitions.AddRange(transitions);
+		public void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);
 
 		public virtual bool TryToTransition()
 		{
