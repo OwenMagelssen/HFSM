@@ -9,20 +9,19 @@ namespace HFSM
 {
 	public abstract class State
 	{
-		// this state's parent state machine
-		protected readonly StateMachine StateMachine;
+		protected readonly StateMachine ParentStateMachine;
 		protected readonly List<Transition> Transitions = new();
 		
-		public State(StateMachine parentStateMachine)
+		public State(StateMachine parentParentStateMachine)
 		{
-			StateMachine = parentStateMachine;
+			ParentStateMachine = parentParentStateMachine;
 		}
 
 		public void AddTransition(Transition transition) => Transitions.Add(transition);
 
 		public virtual bool TryToTransition()
 		{
-			if (StateMachine.TryToTransition())
+			if (ParentStateMachine.TryToTransition())
 				return true;
 			
 			for (int i = 0; i < Transitions.Count; i++)
@@ -30,7 +29,7 @@ namespace HFSM
 				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
-					StateMachine.SetState(transition.ToState);
+					ParentStateMachine.SetState(transition.ToState);
 					return true;
 				}
 			}

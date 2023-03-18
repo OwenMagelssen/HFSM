@@ -12,9 +12,9 @@ namespace HFSM
 		public State CurrentState { get; private set; }
 		protected State DefaultState;
 		protected readonly List<Transition> GlobalTransitions = new();
-		public bool IsRootStateMachine => StateMachine == null;
+		public bool IsRootStateMachine => ParentStateMachine == null;
 
-		public StateMachine(StateMachine parentStateMachine) : base(parentStateMachine)
+		public StateMachine(StateMachine parentParentStateMachine) : base(parentParentStateMachine)
 		{
 			
 		}
@@ -56,7 +56,7 @@ namespace HFSM
 		{
 			if (!IsRootStateMachine)
 			{
-				if (StateMachine.TryToTransition()) 
+				if (ParentStateMachine.TryToTransition()) 
 					return true;
 			}
 			
