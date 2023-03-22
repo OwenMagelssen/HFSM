@@ -49,8 +49,7 @@ namespace HFSM
 
 		public override void OnFixedUpdate()
 		{
-			if (!TryToTransition())
-				CurrentState?.OnFixedUpdate();
+			CurrentState?.OnFixedUpdate();
 		}
 		
 		public override bool TryToTransition()
