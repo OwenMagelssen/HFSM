@@ -52,43 +52,36 @@ namespace HFSM
 			CurrentState?.OnFixedUpdate();
 		}
 
-		public override bool TryToTransition()
+		private bool TryGlobalTransition()
 		{
-			if (!IsRootStateMachine)
+			for (int i = 0; i < GlobalTransitions.Count; i++)
 			{
-				if (ParentStateMachine.TryToTransition()) 
+				var transition = GlobalTransitions[i];
+				if (transition.TryTransition())
+				{
+					SetState(transition.ToState);
 					return true;
-				
-				for (int i = 0; i < GlobalTransitions.Count; i++)
-				{
-					var transition = GlobalTransitions[i];
-					if (transition.TryTransition())
-					{
-						SetState(transition.ToState);
-						return true;
-					}
-				}
-				
-				for (int i = 0; i < Transitions.Count; i++)
-				{
-					var transition = Transitions[i];
-					if (transition.TryTransition())
-					{
-						ParentStateMachine.SetState(transition.ToState);
-						return true;
-					}
 				}
 			}
-			else
+
+			return false;
+		}
+
+		public override bool TryToTransition()
+		{
+			if (IsRootStateMachine) return TryGlobalTransition();
+			
+			if (ParentStateMachine.TryToTransition()) return true;
+
+			if (TryGlobalTransition()) return true;
+			
+			for (int i = 0; i < Transitions.Count; i++)
 			{
-				for (int i = 0; i < GlobalTransitions.Count; i++)
+				var transition = Transitions[i];
+				if (transition.TryTransition())
 				{
-					var transition = GlobalTransitions[i];
-					if (transition.TryTransition())
-					{
-						SetState(transition.ToState);
-						return true;
-					}
+					ParentStateMachine.SetState(transition.ToState);
+					return true;
 				}
 			}
 
