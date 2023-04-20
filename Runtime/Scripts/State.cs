@@ -4,6 +4,7 @@
  ******************************************************************/
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace HFSM
 {
@@ -11,6 +12,7 @@ namespace HFSM
 	{
 		protected readonly StateMachine ParentStateMachine;
 		protected readonly List<Transition> Transitions = new();
+		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
 		
 		public State(StateMachine parentParentStateMachine)
 		{
