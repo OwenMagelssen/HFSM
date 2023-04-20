@@ -11,6 +11,7 @@ namespace HFSM
 	public abstract class StateMachine : State
 	{
 		public State CurrentState { get; private set; }
+		public State CurrentTopLevelState { get; protected set; }
 		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
@@ -25,12 +26,25 @@ namespace HFSM
 
 		public void AddGlobalTransitions(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
 
+		private void SetCurrentTopLevelState(State state)
+		{
+			CurrentTopLevelState = state;
+			var parent = ParentStateMachine;
+			
+			while (parent != null)
+			{
+				parent.CurrentTopLevelState = state;
+				parent = parent.ParentStateMachine;
+			}
+		}
+
 		public void SetState(State state)
 		{
 			if (state == CurrentState) return;
 			var formerState = CurrentState;
 			formerState?.OnExit(state);
 			CurrentState = state;
+			SetCurrentTopLevelState(state);
 			CurrentState?.OnEnter(formerState);
 		}
 
