@@ -10,7 +10,7 @@ namespace HFSM
 	public abstract class StateMachine : State
 	{
 		public State CurrentState { get; private set; }
-		protected State DefaultState;
+		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
 		public bool IsRootStateMachine => ParentStateMachine == null;
 
