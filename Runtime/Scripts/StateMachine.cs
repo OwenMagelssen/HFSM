@@ -4,6 +4,7 @@
  ******************************************************************/
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace HFSM
 {
@@ -12,6 +13,7 @@ namespace HFSM
 		public State CurrentState { get; private set; }
 		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
+		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
 		public bool IsRootStateMachine => ParentStateMachine == null;
 
 		public StateMachine(StateMachine parentParentStateMachine) : base(parentParentStateMachine)
