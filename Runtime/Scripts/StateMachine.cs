@@ -61,7 +61,7 @@ namespace HFSM
 				var transition = GlobalTransitions[i];
 				if (transition.TryTransition())
 				{
-					SetState(transition.ToState);
+					SetState(transition.DestinationState);
 					return true;
 				}
 			}
@@ -82,7 +82,7 @@ namespace HFSM
 				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
-					ParentStateMachine.SetState(transition.ToState);
+					ParentStateMachine.SetState(transition.DestinationState);
 					return true;
 				}
 			}

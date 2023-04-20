@@ -31,7 +31,7 @@ namespace HFSM
 				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
-					ParentStateMachine.SetState(transition.ToState);
+					ParentStateMachine.SetState(transition.DestinationState);
 					return true;
 				}
 			}
