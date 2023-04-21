@@ -6,17 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Mono.Cecil.Cil;
-using UnityEngine;
 
 namespace HFSM
 {
 	public abstract class StateMachine : State
 	{
 		public State CurrentState { get; private set; }
-
-		public State CurrentTopLevelState => currentTopLevelState;
-		protected State currentTopLevelState;
+		public State CurrentTopLevelState { get; private set; }
 		public event Action OnTopLevelStateChanged;
 		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
@@ -32,18 +28,11 @@ namespace HFSM
 
 		public void AddGlobalTransitions(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
 
-		private void SetCurrentTopLevelState(State state)
+		protected void SetCurrentTopLevelState(State state)
 		{
-			currentTopLevelState = state;
-			var parent = ParentStateMachine;
-			
-			while (parent != null)
-			{
-				parent.currentTopLevelState = state;
-				parent = parent.ParentStateMachine;
-			}
-
+			CurrentTopLevelState = state;
 			OnTopLevelStateChanged?.Invoke();
+			ParentStateMachine?.SetCurrentTopLevelState(state);
 		}
 
 		public bool SetState(State state)
@@ -60,6 +49,11 @@ namespace HFSM
 		public override void OnEnter(State previousState)
 		{
 			SetState(DefaultState);
+		}
+
+		public override void OnExit(State nextState)
+		{
+			CurrentState = null;
 		}
 
 		public override void OnUpdate()
