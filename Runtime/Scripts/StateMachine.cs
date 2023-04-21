@@ -3,6 +3,7 @@
  * https://opticnerveinteractive.com
  ******************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -11,7 +12,10 @@ namespace HFSM
 	public abstract class StateMachine : State
 	{
 		public State CurrentState { get; private set; }
-		public State CurrentTopLevelState { get; protected set; }
+
+		public State CurrentTopLevelState => currentTopLevelState;
+		protected State currentTopLevelState;
+		public event Action OnTopLevelStateChanged;
 		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
@@ -28,14 +32,16 @@ namespace HFSM
 
 		private void SetCurrentTopLevelState(State state)
 		{
-			CurrentTopLevelState = state;
+			currentTopLevelState = state;
 			var parent = ParentStateMachine;
 			
 			while (parent != null)
 			{
-				parent.CurrentTopLevelState = state;
+				parent.currentTopLevelState = state;
 				parent = parent.ParentStateMachine;
 			}
+
+			OnTopLevelStateChanged?.Invoke();
 		}
 
 		public void SetState(State state)
