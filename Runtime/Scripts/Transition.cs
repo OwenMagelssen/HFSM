@@ -11,9 +11,9 @@ namespace HFSM
     {
 	    public State DestinationState { get; private set; }
 
-	    public Transition(State transitionDestination)
+	    public Transition(State destinationState)
 	    {
-		    DestinationState = transitionDestination;
+		    DestinationState = destinationState;
 	    }
 	    
 	    public abstract bool TryTransition();
@@ -23,7 +23,7 @@ namespace HFSM
     {
 	    private readonly Func<bool> _condition;
 	    
-	    public ConditionTransition(State transitionDestination, Func<bool> condition) : base(transitionDestination)
+	    public ConditionTransition(State destinationState, Func<bool> condition) : base(destinationState)
 	    {
 		    _condition = condition;
 	    }
