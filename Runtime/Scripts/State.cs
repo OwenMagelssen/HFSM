@@ -40,8 +40,8 @@ namespace HFSM
 				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
-					ParentStateMachine.SetState(transition.DestinationState);
-					return true;
+					if (ParentStateMachine.SetState(transition.DestinationState))
+						return true;
 				}
 			}
 

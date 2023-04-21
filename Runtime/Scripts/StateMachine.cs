@@ -6,6 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace HFSM
 {
@@ -44,14 +46,15 @@ namespace HFSM
 			OnTopLevelStateChanged?.Invoke();
 		}
 
-		public void SetState(State state)
+		public bool SetState(State state)
 		{
-			if (state == CurrentState) return;
+			if (state == CurrentState) return false;
 			var formerState = CurrentState;
 			formerState?.OnExit(state);
 			CurrentState = state;
 			SetCurrentTopLevelState(state);
 			CurrentState?.OnEnter(formerState);
+			return true;
 		}
 
 		public override void OnEnter(State previousState)
@@ -81,8 +84,8 @@ namespace HFSM
 				var transition = GlobalTransitions[i];
 				if (transition.TryTransition())
 				{
-					SetState(transition.DestinationState);
-					return true;
+					if (SetState(transition.DestinationState))
+						return true;
 				}
 			}
 
@@ -91,19 +94,19 @@ namespace HFSM
 
 		public override bool TryToTransition()
 		{
-			if (IsRootStateMachine) return TryGlobalTransition();
+			if (!IsRootStateMachine)
+				if (ParentStateMachine.TryToTransition()) return true;
 			
-			if (ParentStateMachine.TryToTransition()) return true;
-
-			if (TryGlobalTransition()) return true;
+			if (TryGlobalTransition()) 
+					return true;
 			
 			for (int i = 0; i < Transitions.Count; i++)
 			{
 				var transition = Transitions[i];
 				if (transition.TryTransition())
 				{
-					ParentStateMachine.SetState(transition.DestinationState);
-					return true;
+					if (ParentStateMachine.SetState(transition.DestinationState))
+						return true;
 				}
 			}
 
