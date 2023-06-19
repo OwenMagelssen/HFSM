@@ -15,9 +15,9 @@ namespace HFSM
 		protected readonly List<Transition> Transitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
 		
-		public State(StateMachine parentParentStateMachine)
+		public State(StateMachine parentStateMachine)
 		{
-			ParentStateMachine = parentParentStateMachine;
+			ParentStateMachine = parentStateMachine;
 
 			var parent = ParentStateMachine;
 			RootStateMachine = this as StateMachine;

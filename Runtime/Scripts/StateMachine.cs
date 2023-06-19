@@ -19,7 +19,7 @@ namespace HFSM
 		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
 		public bool IsRootStateMachine => ParentStateMachine == null;
 
-		public StateMachine(StateMachine parentParentStateMachine) : base(parentParentStateMachine)
+		public StateMachine(StateMachine parentStateMachine) : base(parentStateMachine)
 		{
 			
 		}
