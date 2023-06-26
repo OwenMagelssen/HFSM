@@ -55,6 +55,8 @@ namespace HFSM
 			return true;
 		}
 
+		public void Initialize() => OnEnter(null);
+
 		public override void OnEnter(State previousState)
 		{
 			SetState(DefaultState);
