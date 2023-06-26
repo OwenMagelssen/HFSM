@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace HFSM
 {
@@ -25,6 +26,14 @@ namespace HFSM
 		}
 
 		public void SetDefaultState(State defaultState) => DefaultState = defaultState;
+		
+		public override void AddTransitions(params Transition[] transitions)
+		{
+			if (IsRootStateMachine)
+				Debug.LogWarning("Non-global transitions on a root state machine will never be checked.");
+			
+			Transitions.AddRange(transitions);
+		}
 
 		public void AddGlobalTransitions(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
 
@@ -88,8 +97,13 @@ namespace HFSM
 
 		public override bool TryToTransition()
 		{
-			if (!IsRootStateMachine)
-				if (ParentStateMachine.TryToTransition()) return true;
+			if (IsRootStateMachine)
+				return TryGlobalTransition();
+			
+			// if this is a sub state machine...
+			
+			if (ParentStateMachine.TryToTransition()) 
+				return true;
 			
 			if (TryGlobalTransition()) 
 					return true;

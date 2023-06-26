@@ -28,7 +28,7 @@ namespace HFSM
 			}
 		}
 
-		public void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);
+		public virtual void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);
 
 		public virtual bool TryToTransition()
 		{
