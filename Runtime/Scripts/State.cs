@@ -10,13 +10,15 @@ namespace HFSM
 {
 	public abstract class State
 	{
+		public readonly string Name;
 		public readonly StateMachine ParentStateMachine;
 		public readonly StateMachine RootStateMachine;
 		protected readonly List<Transition> Transitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
 		
-		public State(StateMachine parentStateMachine)
+		public State(StateMachine parentStateMachine, string name = "")
 		{
+			Name = name;
 			ParentStateMachine = parentStateMachine;
 
 			var parent = ParentStateMachine;

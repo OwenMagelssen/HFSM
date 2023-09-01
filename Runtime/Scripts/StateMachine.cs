@@ -12,6 +12,7 @@ namespace HFSM
 {
 	public abstract class StateMachine : State
 	{
+		public Dictionary<string, State> States { get; private set; }
 		public State CurrentState { get; private set; }
 		public State CurrentTopLevelState { get; private set; }
 		public event Action OnTopLevelStateChanged;
@@ -20,12 +21,16 @@ namespace HFSM
 		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
 		public bool IsRootStateMachine => ParentStateMachine == null;
 
-		public StateMachine(StateMachine parentStateMachine) : base(parentStateMachine)
+		public StateMachine(StateMachine parentStateMachine, string name = "") : base(parentStateMachine, name)
 		{
-			
+			States = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.States;
 		}
 
-		public void SetDefaultState(State defaultState) => DefaultState = defaultState;
+		public void SetDefaultState(State defaultState)
+		{
+			DefaultState = defaultState;
+			States.TryAdd(defaultState.Name, defaultState);
+		}
 		
 		public override void AddTransitions(params Transition[] transitions)
 		{
@@ -33,15 +38,32 @@ namespace HFSM
 				Debug.LogWarning("Non-global transitions on a root state machine will never be checked.");
 			
 			Transitions.AddRange(transitions);
+
+			for (int i = 0; i < transitions.Length; i++)
+				States.TryAdd(transitions[i].DestinationState.Name, transitions[i].DestinationState);
 		}
 
-		public void AddGlobalTransitions(params Transition[] transitions) => GlobalTransitions.AddRange(transitions);
+		public void AddGlobalTransitions(params Transition[] transitions)
+		{
+			GlobalTransitions.AddRange(transitions);
+			
+			for (int i = 0; i < transitions.Length; i++)
+				States.TryAdd(transitions[i].DestinationState.Name, transitions[i].DestinationState);
+		}
 
 		protected void SetCurrentTopLevelState(State state)
 		{
 			CurrentTopLevelState = state;
 			OnTopLevelStateChanged?.Invoke();
 			ParentStateMachine?.SetCurrentTopLevelState(state);
+		}
+
+		public bool SetState(string stateName)
+		{
+			if (States.TryGetValue(stateName, out State state))
+				return SetState(state);
+
+			return false;
 		}
 
 		public bool SetState(State state)
