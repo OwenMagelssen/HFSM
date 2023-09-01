@@ -24,12 +24,12 @@ namespace HFSM
 		public StateMachine(StateMachine parentStateMachine, string name = "") : base(parentStateMachine, name)
 		{
 			States = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.States;
+			States.TryAdd(name, this);
 		}
 
 		public void SetDefaultState(State defaultState)
 		{
 			DefaultState = defaultState;
-			States.TryAdd(defaultState.Name, defaultState);
 		}
 		
 		public override void AddTransitions(params Transition[] transitions)
@@ -38,17 +38,11 @@ namespace HFSM
 				Debug.LogWarning("Non-global transitions on a root state machine will never be checked.");
 			
 			Transitions.AddRange(transitions);
-
-			for (int i = 0; i < transitions.Length; i++)
-				States.TryAdd(transitions[i].DestinationState.Name, transitions[i].DestinationState);
 		}
 
 		public void AddGlobalTransitions(params Transition[] transitions)
 		{
 			GlobalTransitions.AddRange(transitions);
-			
-			for (int i = 0; i < transitions.Length; i++)
-				States.TryAdd(transitions[i].DestinationState.Name, transitions[i].DestinationState);
 		}
 
 		protected void SetCurrentTopLevelState(State state)
