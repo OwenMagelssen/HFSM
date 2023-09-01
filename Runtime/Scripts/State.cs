@@ -11,8 +11,8 @@ namespace HFSM
 	public abstract class State
 	{
 		public readonly string Name;
-		public readonly StateMachine ParentStateMachine;
-		public readonly StateMachine RootStateMachine;
+		public StateMachine ParentStateMachine { get; protected set; }
+		public StateMachine RootStateMachine { get; protected set; }
 		protected readonly List<Transition> Transitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
 		
@@ -20,16 +20,16 @@ namespace HFSM
 		{
 			Name = name;
 			ParentStateMachine = parentStateMachine;
-
 			var parent = ParentStateMachine;
-			RootStateMachine = this as StateMachine;
+			
 			while (parent != null)
 			{
 				RootStateMachine = parent;
 				parent = parent.ParentStateMachine;
 			}
 			
-			RootStateMachine.States.TryAdd(name, this);
+			if (RootStateMachine != null)
+				RootStateMachine.States.TryAdd(name, this);
 		}
 
 		public virtual void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);

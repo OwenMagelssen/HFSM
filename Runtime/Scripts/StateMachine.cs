@@ -23,7 +23,25 @@ namespace HFSM
 
 		public StateMachine(StateMachine parentStateMachine, string name = "") : base(parentStateMachine, name)
 		{
+			if (parentStateMachine == null)
+			{
+				RootStateMachine = this;
+			}
+			else
+			{
+				ParentStateMachine = parentStateMachine;
+				var parent = ParentStateMachine;
+				RootStateMachine = parent;
+				
+				while (parent != null)
+				{
+					RootStateMachine = parent;
+					parent = parent.ParentStateMachine;
+				}
+			}
+			
 			States = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.States;
+			RootStateMachine.States.TryAdd(name, this);
 		}
 
 		public void SetDefaultState(State defaultState)
