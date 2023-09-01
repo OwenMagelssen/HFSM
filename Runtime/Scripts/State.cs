@@ -28,6 +28,8 @@ namespace HFSM
 				RootStateMachine = parent;
 				parent = parent.ParentStateMachine;
 			}
+			
+			RootStateMachine.States.TryAdd(name, this);
 		}
 
 		public virtual void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);

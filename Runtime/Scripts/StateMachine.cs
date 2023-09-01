@@ -24,7 +24,6 @@ namespace HFSM
 		public StateMachine(StateMachine parentStateMachine, string name = "") : base(parentStateMachine, name)
 		{
 			States = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.States;
-			States.TryAdd(name, this);
 		}
 
 		public void SetDefaultState(State defaultState)
@@ -55,8 +54,12 @@ namespace HFSM
 		public bool SetState(string stateName)
 		{
 			if (States.TryGetValue(stateName, out State state))
+			{
+				Debug.Log("found state: " + state);
 				return SetState(state);
+			}
 
+			Debug.Log("unable to find state: " + state);
 			return false;
 		}
 
