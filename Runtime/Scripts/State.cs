@@ -29,7 +29,10 @@ namespace HFSM
 			}
 			
 			if (RootStateMachine != null)
-				RootStateMachine.States.TryAdd(name, this);
+			{
+				RootStateMachine.NamedStatesDictionary.TryAdd(name, this);
+				RootStateMachine.RegisterState(this);
+			}
 		}
 
 		public virtual void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);

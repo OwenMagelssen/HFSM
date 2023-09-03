@@ -12,7 +12,9 @@ namespace HFSM
 {
 	public abstract class StateMachine : State
 	{
-		public Dictionary<string, State> States { get; private set; }
+		public ReadOnlyCollection<State> AllStates => _allStates.AsReadOnly();
+		private List<State> _allStates = new();
+		public Dictionary<string, State> NamedStatesDictionary { get; private set; }
 		public State CurrentState { get; private set; }
 		public State CurrentTopLevelState { get; private set; }
 		public event Action OnTopLevelStateChanged;
@@ -26,6 +28,7 @@ namespace HFSM
 			if (parentStateMachine == null)
 			{
 				RootStateMachine = this;
+				RegisterState(this);
 			}
 			else
 			{
@@ -40,9 +43,11 @@ namespace HFSM
 				}
 			}
 			
-			States = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.States;
-			RootStateMachine.States.TryAdd(name, this);
+			NamedStatesDictionary = IsRootStateMachine ? new Dictionary<string, State>() : RootStateMachine.NamedStatesDictionary;
+			RootStateMachine.NamedStatesDictionary.TryAdd(name, this);
 		}
+
+		public void RegisterState(State state) => _allStates.Add(state);
 
 		public void SetDefaultState(State defaultState)
 		{
@@ -71,7 +76,7 @@ namespace HFSM
 
 		public bool SetState(string stateName)
 		{
-			if (States.TryGetValue(stateName, out State state))
+			if (NamedStatesDictionary.TryGetValue(stateName, out State state))
 			{
 				Debug.Log("found state: " + state);
 				return SetState(state);
