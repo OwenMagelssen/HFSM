@@ -77,12 +77,8 @@ namespace HFSM
 		public bool SetState(string stateName)
 		{
 			if (NamedStatesDictionary.TryGetValue(stateName, out State state))
-			{
-				Debug.Log("found state: " + state);
 				return SetState(state);
-			}
 
-			Debug.Log("unable to find state: " + state);
 			return false;
 		}
 
