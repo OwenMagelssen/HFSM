@@ -22,7 +22,7 @@ namespace HFSM
 		protected readonly List<Transition> GlobalTransitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyGlobalTransitions => GlobalTransitions.AsReadOnly();
 		public bool IsRootStateMachine => ParentStateMachine == null;
-
+		
 		public StateMachine(StateMachine parentStateMachine, string name = "") : base(parentStateMachine, name)
 		{
 			if (parentStateMachine == null)
@@ -47,7 +47,10 @@ namespace HFSM
 			RootStateMachine.NamedStatesDictionary.TryAdd(name, this);
 		}
 
-		public void RegisterState(State state) => _allStates.Add(state);
+		public virtual void RegisterState(State state)
+		{
+			_allStates.Add(state);
+		}
 
 		public void SetDefaultState(State defaultState)
 		{
