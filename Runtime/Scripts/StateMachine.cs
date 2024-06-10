@@ -93,8 +93,11 @@ namespace HFSM
 			CurrentState = state;
 			SetCurrentTopLevelState(state);
 			CurrentState?.OnEnter(formerState);
+			OnStateChanged(state);
 			return true;
 		}
+
+		protected virtual void OnStateChanged(State newState) { }
 
 		public void Initialize() => OnEnter(null);
 
