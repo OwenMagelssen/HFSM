@@ -3,6 +3,7 @@
  * https://opticnerveinteractive.com
  ******************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -15,6 +16,7 @@ namespace HFSM
 		public StateMachine RootStateMachine { get; protected set; }
 		protected readonly List<Transition> Transitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
+		public int StateFlags { get; protected set; }
 		
 		public State(StateMachine parentStateMachine, string name = "")
 		{
