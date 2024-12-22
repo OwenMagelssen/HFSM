@@ -146,7 +146,7 @@ namespace HFSM
 			if (IsRootStateMachine)
 				return TryGlobalTransition();
 			
-			// if this is a sub state machine...
+			// if this is a child state machine...
 			
 			if (ParentStateMachine.TryToTransition()) 
 				return true;
