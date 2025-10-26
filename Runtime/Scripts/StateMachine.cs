@@ -15,8 +15,8 @@ namespace HFSM
 		public ReadOnlyCollection<State> AllStates => _allStates.AsReadOnly();
 		private List<State> _allStates = new();
 		public Dictionary<string, State> NamedStatesDictionary { get; private set; }
-		public State CurrentState { get; private set; }
-		public State CurrentTopLevelState { get; private set; }
+		public State ActiveStateMachine { get; private set; }
+		public State ActiveState { get; private set; }
 		public event Action OnTopLevelStateChanged;
 		public State DefaultState { get; private set; }
 		protected readonly List<Transition> GlobalTransitions = new();
@@ -72,7 +72,7 @@ namespace HFSM
 
 		protected void SetCurrentTopLevelState(State state)
 		{
-			CurrentTopLevelState = state;
+			ActiveState = state;
 			OnTopLevelStateChanged?.Invoke();
 			ParentStateMachine?.SetCurrentTopLevelState(state);
 		}
@@ -87,12 +87,12 @@ namespace HFSM
 
 		public bool SetState(State state)
 		{
-			if (state == CurrentState) return false;
-			var formerState = CurrentState;
+			if (state == ActiveStateMachine) return false;
+			var formerState = ActiveStateMachine;
 			formerState?.OnExit(state);
-			CurrentState = state;
+			ActiveStateMachine = state;
 			SetCurrentTopLevelState(state);
-			CurrentState?.OnEnter(formerState);
+			ActiveStateMachine?.OnEnter(formerState);
 			OnStateChanged(state);
 			return true;
 		}
@@ -108,22 +108,22 @@ namespace HFSM
 
 		public override void OnExit(State nextState)
 		{
-			CurrentState = null;
+			ActiveStateMachine = null;
 		}
 
 		public override void OnUpdate()
 		{
-			CurrentState?.OnUpdate();
+			ActiveStateMachine?.OnUpdate();
 		}
 
 		public override void OnLateUpdate()
 		{
-			CurrentState?.OnLateUpdate();
+			ActiveStateMachine?.OnLateUpdate();
 		}
 
 		public override void OnFixedUpdate()
 		{
-			CurrentState?.OnFixedUpdate();
+			ActiveStateMachine?.OnFixedUpdate();
 		}
 
 		private bool TryGlobalTransition()
