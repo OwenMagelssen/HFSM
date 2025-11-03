@@ -16,6 +16,7 @@ namespace HFSM
 		protected readonly List<Transition> Transitions = new();
 		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
 		public int StateFlags { get; protected set; }
+		public bool CanTransition = true;
 		
 		public State(StateMachine parentStateMachine, string name = "")
 		{
@@ -40,8 +41,8 @@ namespace HFSM
 
 		public virtual bool TryToTransition()
 		{
-			if (ParentStateMachine.TryToTransition())
-				return true;
+			if (!CanTransition) return false;
+			if (ParentStateMachine.TryToTransition()) return true;
 			
 			for (int i = 0; i < Transitions.Count; i++)
 			{

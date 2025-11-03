@@ -111,9 +111,14 @@ namespace HFSM
 			ActiveStateMachine = null;
 		}
 
-		public override void OnUpdate(float deltaTime)
+		public override void OnUpdate(float deltaTime) { }
+
+		public void Tick(float deltaTime)
 		{
 			ActiveStateMachine?.OnUpdate(deltaTime);
+			ActiveStateMachine?.TryToTransition();
+			ActiveState?.OnUpdate(deltaTime);
+			ActiveState?.TryToTransition();
 		}
 
 		private bool TryGlobalTransition()
@@ -133,16 +138,13 @@ namespace HFSM
 
 		public override bool TryToTransition()
 		{
-			if (IsRootStateMachine)
-				return TryGlobalTransition();
+			if (!CanTransition) return false;
+			if (IsRootStateMachine) return TryGlobalTransition();
 			
-			// if this is a child state machine...
+			// if this is a nested state machine...
 			
-			if (ParentStateMachine.TryToTransition()) 
-				return true;
-			
-			if (TryGlobalTransition()) 
-					return true;
+			if (ParentStateMachine.TryToTransition()) return true;
+			if (TryGlobalTransition()) return true;
 			
 			for (int i = 0; i < Transitions.Count; i++)
 			{
