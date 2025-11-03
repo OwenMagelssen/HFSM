@@ -111,19 +111,9 @@ namespace HFSM
 			ActiveStateMachine = null;
 		}
 
-		public override void OnUpdate()
+		public override void OnUpdate(float deltaTime)
 		{
-			ActiveStateMachine?.OnUpdate();
-		}
-
-		public override void OnLateUpdate()
-		{
-			ActiveStateMachine?.OnLateUpdate();
-		}
-
-		public override void OnFixedUpdate()
-		{
-			ActiveStateMachine?.OnFixedUpdate();
+			ActiveStateMachine?.OnUpdate(deltaTime);
 		}
 
 		private bool TryGlobalTransition()

@@ -60,10 +60,6 @@ namespace HFSM
 		
 		public abstract void OnExit(State nextState);
 		
-		public abstract void OnUpdate();
-		
-		public abstract void OnLateUpdate();
-		
-		public abstract void OnFixedUpdate();
+		public abstract void OnUpdate(float deltaTime);
 	}
 }
