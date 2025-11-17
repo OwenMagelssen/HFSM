@@ -4,30 +4,32 @@
  ******************************************************************/
 
 using System;
+using UnityEngine;
 
 namespace HFSM
 {
-    public abstract class Transition
-    {
-	    public State DestinationState { get; private set; }
+	public abstract class Transition
+	{
+		public State DestinationState { get; private set; }
 
-	    public Transition(State destinationState)
-	    {
-		    DestinationState = destinationState;
-	    }
-	    
-	    public abstract bool TryTransition();
-    }
+		public Transition(State destinationState)
+		{
+			if (destinationState == null) Debug.LogError("DestinationState of a Transition cannot be null");
+			DestinationState = destinationState;
+		}
 
-    public class ConditionTransition : Transition
-    {
-	    private readonly Func<bool> _condition;
-	    
-	    public ConditionTransition(State destinationState, Func<bool> condition) : base(destinationState)
-	    {
-		    _condition = condition;
-	    }
+		public abstract bool TryTransition();
+	}
 
-	    public override bool TryTransition() => _condition();
-    }
+	public class ConditionTransition : Transition
+	{
+		private readonly Func<bool> _condition;
+
+		public ConditionTransition(State destinationState, Func<bool> condition) : base(destinationState)
+		{
+			_condition = condition;
+		}
+
+		public override bool TryTransition() => _condition();
+	}
 }

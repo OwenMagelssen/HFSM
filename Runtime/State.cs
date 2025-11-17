@@ -1,5 +1,5 @@
 /******************************************************************
- * Copyright (C) 2023 Optic Nerve Interactive. All rights reserved.
+ * Copyright (C) 2025 Optic Nerve Interactive. All rights reserved.
  * https://opticnerveinteractive.com
  ******************************************************************/
 
@@ -11,56 +11,125 @@ namespace HFSM
 	public abstract class State
 	{
 		public readonly string Name;
-		public StateMachine ParentStateMachine { get; protected set; }
-		public StateMachine RootStateMachine { get; protected set; }
-		protected readonly List<Transition> Transitions = new();
-		public ReadOnlyCollection<Transition> ReadOnlyTransitions => Transitions.AsReadOnly();
-		public int StateFlags { get; protected set; }
+		public readonly int Id;
+		public bool Enabled = true;
 		public bool CanTransition = true;
+		public State Parent { get; protected set; }
+		public State ActiveSubState { get; set; }
+		public int StateFlags { get; protected set; }
 		
-		public State(StateMachine parentStateMachine, string name = "")
+
+		protected readonly StateMachine StateMachine;
+		public State DefaultSubState { get; private set; }
+		protected State[] SubStates = { };
+		private List<State> _subStatesList = new();
+		protected Transition[] Transitions = { };
+
+		public State(StateMachine stateMachine, State parent, string name)
 		{
 			Name = name;
-			ParentStateMachine = parentStateMachine;
-			var parent = ParentStateMachine;
-			
-			while (parent != null)
-			{
-				RootStateMachine = parent;
-				parent = parent.ParentStateMachine;
-			}
-			
-			if (RootStateMachine != null)
-			{
-				RootStateMachine.NamedStatesDictionary.TryAdd(name, this);
-				RootStateMachine.RegisterState(this);
-			}
+			Id = NameToID(Name);
+			StateMachine = stateMachine;
+			StateMachine.RegisterState(this);
 		}
 
-		public virtual void AddTransitions(params Transition[] transitions) => Transitions.AddRange(transitions);
-
-		public virtual bool TryToTransition()
+		public static int NameToID(string str)
 		{
-			if (!CanTransition) return false;
-			if (ParentStateMachine.TryToTransition()) return true;
-			
-			for (int i = 0; i < Transitions.Count; i++)
+			uint hash = 2166136261;
+
+			foreach (char c in str)
+				hash = (hash ^ c) * 16777619;
+
+			return unchecked((int) hash);
+		}
+
+		public void Initialize()
+		{
+			SubStates = _subStatesList.ToArray();
+			_subStatesList.Clear();
+			DefaultSubState = SubStates.Length > 0 ? SubStates[0] : null;
+		}
+
+		private void AddSubState(State state)
+		{
+			_subStatesList.Add(state);
+		}
+
+		public void AddTransitions(params Transition[] transitions)
+		{
+			Transition[] newTransitions = new Transition[Transitions.Length + transitions.Length];
+
+			for (int i = Transitions.Length, n = newTransitions.Length; i < n; i++)
+				newTransitions[i] = transitions[i - SubStates.Length];
+
+			Transitions = newTransitions;
+		}
+
+		public bool TryToTransition(out State nextState)
+		{
+			if (!CanTransition)
 			{
-				var transition = Transitions[i];
+				nextState = null;
+				return false;
+			}
+
+			// array foreach is highly optimized
+			foreach (var transition in Transitions)
+			{
+				if (!transition.DestinationState.Enabled) continue;
 				if (transition.TryTransition())
 				{
-					if (ParentStateMachine.SetState(transition.DestinationState))
-						return true;
+					nextState = transition.DestinationState;
+					return true;
 				}
+			}
+
+			nextState = null;
+			return false;
+		}
+
+		public State NearestCommonAncestorWith(State state)
+		{
+			State a = Parent;
+			State b = state.Parent;
+
+			while (a != null && b != null)
+			{
+				if (a == b) return a;
+				a = a.Parent;
+				b = b.Parent;
+			}
+
+			return null;
+		}
+
+		public bool IsSiblingOf(State state)
+		{
+			return state.Parent == Parent;
+		}
+
+		public bool IsDescendantOf(State state)
+		{
+			return state.IsAncestorOf(this);
+		}
+
+		public bool IsAncestorOf(State state)
+		{
+			State ancestor = state.Parent;
+
+			while (ancestor != null)
+			{
+				if (ancestor == this) return true;
+				ancestor = ancestor.Parent;
 			}
 
 			return false;
 		}
-		
+
 		public abstract void OnEnter(State previousState);
-		
+
 		public abstract void OnExit(State nextState);
-		
+
 		public abstract void OnUpdate(float deltaTime);
 	}
 }
