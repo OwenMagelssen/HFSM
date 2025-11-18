@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using UnityEngine;
 
 namespace HFSM
 {
@@ -127,6 +126,8 @@ namespace HFSM
 				state = state.Parent;
 			}
 		}
+		
+		public virtual void LogError(string error) { }
 
 		public void SetRootState(State rootState)
 		{
@@ -137,7 +138,7 @@ namespace HFSM
 		{
 			if (!StateDictionary.TryAdd(state.Id, state))
 			{
-				// Debug.LogError($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
+				LogError($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
 			}
 			
 			if (_allStates.Contains(state)) return;
@@ -161,7 +162,7 @@ namespace HFSM
 			if (StateDictionary.TryGetValue(id, out State state))
 				return SetState(state);
 
-			// Debug.LogWarning($"State with name {stateName} does not exist");
+			LogError($"State with ID {id.ToString()} does not exist");
 			return false;
 		}
 
