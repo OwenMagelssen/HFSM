@@ -131,7 +131,6 @@ namespace HFSM
 		public void SetRootState(State rootState)
 		{
 			RootState = rootState;
-			RegisterState(RootState);
 		}
 
 		public void RegisterState(State state)
