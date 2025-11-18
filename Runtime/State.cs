@@ -115,6 +115,7 @@ namespace HFSM
 
 		public bool IsAncestorOf(State state)
 		{
+			if (state == null) return false;
 			State ancestor = state.Parent;
 
 			while (ancestor != null)

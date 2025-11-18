@@ -52,6 +52,7 @@ namespace HFSM
 		public void SetRootState(State rootState)
 		{
 			RootState = rootState;
+			RegisterState(RootState);
 		}
 
 		public void RegisterState(State state)
@@ -104,31 +105,34 @@ namespace HFSM
 			}
 
 			var formerState = ActiveState;
-			var commonAncestor = formerState.NearestCommonAncestorWith(nextState);
+			var commonAncestor =  formerState == null ? RootState : formerState.NearestCommonAncestorWith(nextState);
 			ActiveState = nextState; // ActiveStateBuffer is updated when ActiveState is set
 
-			// exit all previously active states, passing newly active
-			// siblings as "nextState" argument if they exist, otherwise passing in ActiveState
-			var fs = formerState;
-			while (fs != commonAncestor)
+			if (formerState != null)
 			{
-				bool foundSibling = false;
-
-				for (int i = 0, n = ActiveStateBuffer.Count; i < n; i++)
+				// exit all previously active states, passing newly active
+				// siblings as "nextState" argument if they exist, otherwise passing in ActiveState
+				var fs = formerState;
+				while (fs != commonAncestor)
 				{
-					var s = ActiveStateBuffer.States[i];
-					if (!s.IsSiblingOf(fs)) continue;
-					fs.OnExit(s);
-					foundSibling = true;
-					break;
+					bool foundSibling = false;
+
+					for (int i = 0, n = ActiveStateBuffer.Count; i < n; i++)
+					{
+						var s = ActiveStateBuffer.States[i];
+						if (!s.IsSiblingOf(fs)) continue;
+						fs.OnExit(s);
+						foundSibling = true;
+						break;
+					}
+
+					if (!foundSibling) fs.OnExit(nextState);
+					fs = fs.Parent;
 				}
 
-				if (!foundSibling) fs.OnExit(nextState);
-				fs = fs.Parent;
+				if (state != nextState) // the state passed into this function had substates
+					commonAncestor = formerState.NearestCommonAncestorWith(state);
 			}
-
-			if (state != nextState) // the state passed into this function had substates
-				commonAncestor = formerState.NearestCommonAncestorWith(state);
 
 			int caIndex = ActiveStateBuffer.IndexOf(commonAncestor);
 
@@ -152,7 +156,7 @@ namespace HFSM
 				state.Initialize();
 
 			Initialized = true;
-			ActiveState = RootState; // we use this instead of SetState, which requires ActiveState to not be null
+			SetState(RootState);
 			OnStart();
 			OnInitialized?.Invoke();
 			RootState.OnEnter(null);
