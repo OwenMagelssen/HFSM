@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 
 namespace HFSM
 {
-	public class StateMachine
+	public partial class StateMachine
 	{
 		public State RootState { get; private set; }
 
@@ -33,84 +33,6 @@ namespace HFSM
 		public event Action OnInitialized;
 		public bool Initialized { get; private set; }
 
-		protected class StateBuffer
-		{
-			public State[] States = { };
-			public int Count { get; private set; }
-
-			public int Capacity
-			{
-				get => _capacity;
-				set
-				{
-					if (value <= _capacity) return;
-					_capacity = value;
-					State[] newBuffer = new State[_capacity];
-
-					for (int i = 0; i < States.Length; i++)
-						newBuffer[i] = States[i];
-
-					States = newBuffer;
-				}
-			}
-
-			private int _capacity;
-
-			public int IndexOf(State state)
-			{
-				for (int i = 0, n = States.Length; i < n; i++)
-				{
-					if (state == States[i])
-						return i;
-				}
-
-				return -1;
-			}
-
-			public void SetBufferFromState(State state)
-			{
-				int count = 0;
-				State s = state;
-
-				while (s != null)
-				{
-					count += 1;
-					s = s.Parent;
-				}
-
-				Count = count;
-				if (Capacity < Count) Capacity = Count;
-				s = state;
-
-				for (int i = count - 1; i >= 0; i--)
-				{
-					States[i] = s;
-					s = s.Parent;
-				}
-			}
-
-			public bool CheckForTransitions(out State nextState)
-			{
-				for (int i = 0; i < Count; i++)
-				{
-					if (States[i].TryToTransition(out State destinationState))
-					{
-						nextState = destinationState;
-						return true;
-					}
-				}
-
-				nextState = null;
-				return false;
-			}
-
-			public void UpdateAll(float deltaTime)
-			{
-				for (int i = 0; i < Count; i++)
-					States[i].OnUpdate(deltaTime);
-			}
-		}
-
 		public StateMachine()
 		{
 			StateDictionary = new Dictionary<int, State>();
@@ -126,8 +48,6 @@ namespace HFSM
 				state = state.Parent;
 			}
 		}
-		
-		public virtual void LogError(string error) { }
 
 		public void SetRootState(State rootState)
 		{
@@ -237,8 +157,6 @@ namespace HFSM
 			OnInitialized?.Invoke();
 			RootState.OnEnter(null);
 		}
-		
-		protected virtual void OnStart() { }
 
 		public void Update(float deltaTime)
 		{
@@ -250,5 +168,9 @@ namespace HFSM
 
 			ActiveStateBuffer.UpdateAll(deltaTime);
 		}
+		
+		public virtual void LogError(string error) { }
+		
+		protected virtual void OnStart() { }
 	}
 }
