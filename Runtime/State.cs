@@ -30,6 +30,7 @@ namespace HFSM
 			Name = name;
 			Id = NameToID(Name);
 			StateMachine = stateMachine;
+			Parent = parent;
 			StateMachine.RegisterState(this);
 		}
 
