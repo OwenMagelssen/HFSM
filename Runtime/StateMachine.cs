@@ -138,8 +138,9 @@ namespace HFSM
 
 			if (caIndex >= 0 && caIndex < ActiveStateBuffer.Count - 1)
 			{
-				// commonAncestor is already active, so we start with its active substate
-				for (int i = caIndex + 1, n = ActiveStateBuffer.Count; i < n; i++)
+				// if former state isn't null, commonAncestor is already active, so we start with its active substate
+				int i = formerState == null ? 0 : caIndex + 1;
+				for (int n = ActiveStateBuffer.Count; i < n; i++)
 				{
 					var s = ActiveStateBuffer.States[i];
 					s.OnEnter(s.Parent.ActiveSubState);
