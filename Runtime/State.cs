@@ -29,8 +29,9 @@ namespace HFSM
 			Name = name;
 			Id = NameToID(Name);
 			StateMachine = stateMachine;
-			Parent = parent;
 			StateMachine.RegisterState(this);
+			Parent = parent;
+			Parent?.AddSubState(this);
 		}
 
 		public static int NameToID(string str)

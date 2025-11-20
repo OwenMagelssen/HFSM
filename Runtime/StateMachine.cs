@@ -134,17 +134,25 @@ namespace HFSM
 					commonAncestor = formerState.NearestCommonAncestorWith(state);
 			}
 
-			int caIndex = ActiveStateBuffer.IndexOf(commonAncestor);
+			// if former state isn't null, commonAncestor is already active,
+			// so we start with its active substate (i.e. commonAncestor index + 1)
+			int firstStateToEnter = ActiveStateBuffer.IndexOf(commonAncestor) + 1;
 
-			if (caIndex >= 0 && caIndex < ActiveStateBuffer.Count - 1)
+			if (firstStateToEnter >= 0 && firstStateToEnter < ActiveStateBuffer.Count - 1)
 			{
-				// if former state isn't null, commonAncestor is already active, so we start with its active substate
-				int i = formerState == null ? 0 : caIndex + 1;
-				for (int n = ActiveStateBuffer.Count; i < n; i++)
+				for (int i = firstStateToEnter,  n = ActiveStateBuffer.Count; i < n; i++)
 				{
 					var s = ActiveStateBuffer.States[i];
-					s.OnEnter(s.Parent.ActiveSubState);
-					s.Parent.ActiveSubState = s;
+
+					if (s.Parent == null)
+					{
+						s.OnEnter(null);
+					}
+					else
+					{
+						s.OnEnter(s.Parent.ActiveSubState);
+						s.Parent.ActiveSubState = s;
+					}
 				}
 			}
 
