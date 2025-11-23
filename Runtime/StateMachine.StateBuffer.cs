@@ -5,11 +5,11 @@
 
 namespace HFSM
 {
-	public partial class StateMachine
+	public partial class StateMachine<T> where T : StateData
 	{
 		protected class StateBuffer
 		{
-			public State[] States = { };
+			public State<T>[] States = { };
 			public int Count { get; private set; }
 
 			public int Capacity
@@ -19,7 +19,7 @@ namespace HFSM
 				{
 					if (value <= _capacity) return;
 					_capacity = value;
-					State[] newBuffer = new State[_capacity];
+					State<T>[] newBuffer = new State<T>[_capacity];
 
 					for (int i = 0; i < States.Length; i++)
 						newBuffer[i] = States[i];
@@ -30,7 +30,7 @@ namespace HFSM
 
 			private int _capacity;
 
-			public int IndexOf(State state)
+			public int IndexOf(State<T> state)
 			{
 				for (int i = 0, n = States.Length; i < n; i++)
 				{
@@ -41,10 +41,10 @@ namespace HFSM
 				return -1;
 			}
 
-			public void SetBufferFromState(State state)
+			public void SetBufferFromState(State<T> state)
 			{
 				int count = 0;
-				State s = state;
+				State<T> s = state;
 
 				while (s != null)
 				{
@@ -63,11 +63,11 @@ namespace HFSM
 				}
 			}
 
-			public bool CheckForTransitions(out State nextState)
+			public bool CheckForTransitions(out State<T> nextState)
 			{
 				for (int i = 0; i < Count; i++)
 				{
-					if (States[i].TryToTransition(out State destinationState))
+					if (States[i].TryToTransition(out State<T> destinationState))
 					{
 						nextState = destinationState;
 						return true;

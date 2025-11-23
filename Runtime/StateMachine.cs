@@ -9,11 +9,11 @@ using System.Collections.ObjectModel;
 
 namespace HFSM
 {
-	public partial class StateMachine
+	public partial class StateMachine<T> where T : StateData
 	{
-		public State RootState { get; private set; }
+		public State<T> RootState { get; private set; }
 
-		public State ActiveState
+		public State<T> ActiveState
 		{
 			get => _activeState;
 			protected set
@@ -24,18 +24,18 @@ namespace HFSM
 			}
 		}
 
-		private State _activeState;
-		public event Action<State> OnStateChanged;
-		public ReadOnlyCollection<State> AllStates => _allStates.AsReadOnly();
-		private List<State> _allStates = new();
-		protected Dictionary<int, State> StateDictionary { get; private set; }
+		private State<T> _activeState;
+		public event Action<State<T>> OnStateChanged;
+		public ReadOnlyCollection<State<T>> AllStates => _allStates.AsReadOnly();
+		private List<State<T>> _allStates = new();
+		protected Dictionary<int, State<T>> StateDictionary { get; private set; }
 		protected StateBuffer ActiveStateBuffer = new StateBuffer();
 		public event Action OnInitialized;
 		public bool Initialized { get; private set; }
 
 		public StateMachine()
 		{
-			StateDictionary = new Dictionary<int, State>();
+			StateDictionary = new Dictionary<int, State<T>>();
 		}
 
 		~StateMachine()
@@ -49,13 +49,13 @@ namespace HFSM
 			}
 		}
 
-		public void SetRootState(State rootState)
+		public void SetRootState(State<T> rootState)
 		{
 			RootState = rootState;
 			RegisterState(RootState);
 		}
 
-		public void RegisterState(State state)
+		public void RegisterState(State<T> state)
 		{
 			if (!StateDictionary.TryAdd(state.Id, state))
 			{
@@ -68,19 +68,19 @@ namespace HFSM
 
 		public bool SetState(string stateName)
 		{
-			int id = State.NameToID(stateName);
+			int id = State<T>.NameToID(stateName);
 			return SetState(id);
 		}
 
 		public bool SetState(string stateName, out int id)
 		{
-			id = State.NameToID(stateName);
+			id = State<T>.NameToID(stateName);
 			return SetState(id);
 		}
 
 		public bool SetState(int id)
 		{
-			if (StateDictionary.TryGetValue(id, out State state))
+			if (StateDictionary.TryGetValue(id, out State<T> state))
 				return SetState(state);
 
 			LogError($"State with ID {id.ToString()} does not exist");
@@ -88,7 +88,7 @@ namespace HFSM
 		}
 
 
-		public bool SetState(State state)
+		public bool SetState(State<T> state)
 		{
 			if (state == ActiveState
 			    || state == null
@@ -173,7 +173,7 @@ namespace HFSM
 
 		public void Update(float deltaTime)
 		{
-			if (ActiveStateBuffer.CheckForTransitions(out State nextState))
+			if (ActiveStateBuffer.CheckForTransitions(out State<T> nextState))
 			{
 				SetState(nextState);
 				return;

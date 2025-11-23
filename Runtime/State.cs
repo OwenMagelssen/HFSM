@@ -7,27 +7,30 @@ using System.Collections.Generic;
 
 namespace HFSM
 {
-	public abstract class State
+	public class State<T> where T : StateData
 	{
 		public readonly string Name;
 		public readonly int Id;
 		public bool Enabled = true;
 		public bool CanTransition = true;
-		public State Parent { get; protected set; }
-		public State ActiveSubState { get; set; }
-		public int StateFlags { get; protected set; }
+		public State<T> Parent { get; protected set; }
+		public State<T> DefaultSubState { get; private set; }
+		public State<T> ActiveSubState { get; set; }
+		public readonly T StateData;
 		
+		private readonly StateLogic<T> StateLogic;
+		private readonly StateMachine<T> StateMachine;
+		private State<T>[] SubStates = { };
+		private List<State<T>> _subStatesList = new();
+		private Transition<T>[] Transitions = { };
 
-		protected readonly StateMachine StateMachine;
-		public State DefaultSubState { get; private set; }
-		protected State[] SubStates = { };
-		private List<State> _subStatesList = new();
-		protected Transition[] Transitions = { };
-
-		public State(StateMachine stateMachine, State parent, string name)
+		public State(StateMachine<T> stateMachine, State<T> parent, string name, StateLogic<T> stateLogic, T stateData)
 		{
 			Name = name;
 			Id = NameToID(Name);
+			StateData = stateData;
+			StateLogic = stateLogic;
+			StateLogic.Data = StateData;
 			StateMachine = stateMachine;
 			StateMachine.RegisterState(this);
 			Parent = parent;
@@ -51,14 +54,14 @@ namespace HFSM
 			DefaultSubState = SubStates.Length > 0 ? SubStates[0] : null;
 		}
 
-		private void AddSubState(State state)
+		private void AddSubState(State<T> state)
 		{
 			_subStatesList.Add(state);
 		}
 
-		public void AddTransitions(params Transition[] transitions)
+		public void AddTransitions(params Transition<T>[] transitions)
 		{
-			Transition[] newTransitions = new Transition[Transitions.Length + transitions.Length];
+			Transition<T>[] newTransitions = new Transition<T>[Transitions.Length + transitions.Length];
 
 			for (int i = Transitions.Length, n = newTransitions.Length; i < n; i++)
 				newTransitions[i] = transitions[i - SubStates.Length];
@@ -66,7 +69,7 @@ namespace HFSM
 			Transitions = newTransitions;
 		}
 
-		public bool TryToTransition(out State nextState)
+		public bool TryToTransition(out State<T> nextState)
 		{
 			if (!CanTransition)
 			{
@@ -89,10 +92,10 @@ namespace HFSM
 			return false;
 		}
 
-		public State NearestCommonAncestorWith(State state)
+		public State<T> NearestCommonAncestorWith(State<T> state)
 		{
-			State a = Parent;
-			State b = state.Parent;
+			State<T> a = Parent;
+			State<T> b = state.Parent;
 
 			while (a != null && b != null)
 			{
@@ -104,20 +107,20 @@ namespace HFSM
 			return null;
 		}
 
-		public bool IsSiblingOf(State state)
+		public bool IsSiblingOf(State<T> state)
 		{
 			return state.Parent == Parent;
 		}
 
-		public bool IsDescendantOf(State state)
+		public bool IsDescendantOf(State<T> state)
 		{
 			return state.IsAncestorOf(this);
 		}
 
-		public bool IsAncestorOf(State state)
+		public bool IsAncestorOf(State<T> state)
 		{
 			if (state == null) return false;
-			State ancestor = state.Parent;
+			State<T> ancestor = state.Parent;
 
 			while (ancestor != null)
 			{
@@ -128,10 +131,19 @@ namespace HFSM
 			return false;
 		}
 
-		public abstract void OnEnter(State previousState);
+		public void OnEnter(State<T> previousState)
+		{
+			StateLogic.OnEnter(previousState);
+		}
 
-		public abstract void OnExit(State nextState);
+		public void OnExit(State<T> nextState)
+		{
+			StateLogic.OnExit(nextState);
+		}
 
-		public abstract void OnUpdate(float deltaTime);
+		public void OnUpdate(float deltaTime)
+		{
+			StateLogic.OnUpdate(deltaTime);
+		}
 	}
 }
