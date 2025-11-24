@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 
 namespace HFSM
 {
-	public partial class StateMachine<T> where T : StateData
+	public partial class StateMachine<T> : IStateMachine where T : StateData
 	{
 		public State<T> RootState { get; private set; }
 
@@ -28,15 +28,10 @@ namespace HFSM
 		public event Action<State<T>> OnStateChanged;
 		public ReadOnlyCollection<State<T>> AllStates => _allStates.AsReadOnly();
 		private List<State<T>> _allStates = new();
-		protected Dictionary<int, State<T>> StateDictionary { get; private set; }
+		protected Dictionary<int, State<T>> StateDictionary { get; private set; } = new();
 		protected StateBuffer ActiveStateBuffer = new StateBuffer();
 		public event Action OnInitialized;
 		public bool Initialized { get; private set; }
-
-		public StateMachine()
-		{
-			StateDictionary = new Dictionary<int, State<T>>();
-		}
 
 		~StateMachine()
 		{
@@ -166,7 +161,7 @@ namespace HFSM
 
 			Initialized = true;
 			SetState(RootState);
-			OnStart();
+			OnInitialize();
 			OnInitialized?.Invoke();
 			RootState.OnEnter(null);
 		}
@@ -182,8 +177,8 @@ namespace HFSM
 			ActiveStateBuffer.UpdateAll(deltaTime);
 		}
 		
-		public virtual void LogError(string error) { }
+		protected virtual void LogError(string error) { }
 		
-		protected virtual void OnStart() { }
+		protected virtual void OnInitialize() { }
 	}
 }
