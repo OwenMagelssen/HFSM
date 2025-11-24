@@ -11,8 +11,8 @@ namespace HFSM
 		public int Id { get; }
 		public bool Enabled { get; set; }
 		public bool CanTransition { get; set; }
-		public IState Parent { get; }
-		public IState DefaultSubState { get; }
-		public IState ActiveSubState { get; }
+		public IState iParent { get; }
+		public IState iDefaultSubState { get; }
+		public IState iActiveSubState { get; }
 	}
 }
