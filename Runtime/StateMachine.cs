@@ -11,8 +11,10 @@ namespace HFSM
 {
 	public partial class StateMachine<T> : IStateMachine where T : StateData
 	{
+		public IState iRootState => RootState;
 		public State<T> RootState { get; private set; }
 
+		public IState iActiveState => _activeState;
 		public State<T> ActiveState
 		{
 			get => _activeState;
