@@ -7,15 +7,18 @@ using System.Collections.Generic;
 
 namespace HFSM
 {
-	public class State<T> where T : StateData
+	public class State<T> : IState where T : StateData
 	{
-		public readonly string Name;
-		public readonly int Id;
-		public bool Enabled = true;
-		public bool CanTransition = true;
-		public State<T> Parent { get; protected set; }
-		public State<T> DefaultSubState { get; private set; }
-		public State<T> ActiveSubState { get; set; }
+		public string Name { get; protected set; }
+		public int Id { get; protected set; }
+		public bool Enabled { get; set; } = true;
+		public bool CanTransition { get; set; } = true;
+		public IState Parent => m_Parent;
+		public readonly State<T> m_Parent;
+		public IState DefaultSubState => m_DefaultSubState;
+		public State<T> m_DefaultSubState { get; private set; }
+		public IState ActiveSubState => m_ActiveSubState;
+		public State<T> m_ActiveSubState { get; set; }
 		public readonly T StateData;
 		
 		private readonly StateLogic<T> StateLogic;
@@ -33,8 +36,8 @@ namespace HFSM
 			StateLogic.Data = StateData;
 			StateMachine = stateMachine;
 			StateMachine.RegisterState(this);
-			Parent = parent;
-			Parent?.AddSubState(this);
+			m_Parent = parent;
+			m_Parent?.AddSubState(this);
 		}
 
 		public static int NameToID(string str)
@@ -51,7 +54,7 @@ namespace HFSM
 		{
 			SubStates = _subStatesList.ToArray();
 			_subStatesList.Clear();
-			DefaultSubState = SubStates.Length > 0 ? SubStates[0] : null;
+			m_DefaultSubState = SubStates.Length > 0 ? SubStates[0] : null;
 		}
 
 		private void AddSubState(State<T> state)
@@ -94,14 +97,14 @@ namespace HFSM
 
 		public State<T> NearestCommonAncestorWith(State<T> state)
 		{
-			State<T> a = Parent;
-			State<T> b = state.Parent;
+			State<T> a = m_Parent;
+			State<T> b = state.m_Parent;
 
 			while (a != null && b != null)
 			{
 				if (a == b) return a;
-				a = a.Parent;
-				b = b.Parent;
+				a = a.m_Parent;
+				b = b.m_Parent;
 			}
 
 			return null;
@@ -120,12 +123,12 @@ namespace HFSM
 		public bool IsAncestorOf(State<T> state)
 		{
 			if (state == null) return false;
-			State<T> ancestor = state.Parent;
+			State<T> ancestor = state.m_Parent;
 
 			while (ancestor != null)
 			{
 				if (ancestor == this) return true;
-				ancestor = ancestor.Parent;
+				ancestor = ancestor.m_Parent;
 			}
 
 			return false;

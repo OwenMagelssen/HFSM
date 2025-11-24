@@ -52,9 +52,9 @@ namespace HFSM
 
 		public void RegisterState(State<T> state)
 		{
-			if (!StateDictionary.TryAdd(state.Id, state))
+			if (!StateDictionary.TryAdd(state.m_Id, state))
 			{
-				LogError($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
+				LogError($"Duplicate state name {state.m_Name} cannot be added to the StateMachine.");
 			}
 			
 			if (_allStates.Contains(state)) return;
@@ -91,12 +91,12 @@ namespace HFSM
 
 			var nextState = state;
 
-			while (nextState.DefaultSubState != null)
+			while (nextState.m_DefaultSubState != null)
 			{
 				// setting this to null ensures null is the argument given to OnEnter
 				// when default substates are activated
-				nextState.ActiveSubState = null;
-				nextState = nextState.DefaultSubState;
+				nextState.m_ActiveSubState = null;
+				nextState = nextState.m_DefaultSubState;
 			}
 
 			var formerState = ActiveState;
