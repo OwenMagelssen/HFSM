@@ -26,6 +26,8 @@ namespace HFSM
 
 		private State<T> _activeState;
 		public event Action<State<T>> OnStateChanged;
+		public ReadOnlyCollection<IState> iAllStates => _iAllStates.AsReadOnly();
+		private List<IState> _iAllStates = new();
 		public ReadOnlyCollection<State<T>> AllStates => _allStates.AsReadOnly();
 		private List<State<T>> _allStates = new();
 		protected Dictionary<int, State<T>> StateDictionary { get; private set; } = new();
@@ -59,6 +61,7 @@ namespace HFSM
 			
 			if (_allStates.Contains(state)) return;
 			_allStates.Add(state);
+			_iAllStates.Add(state);
 		}
 
 		public bool SetState(string stateName)
