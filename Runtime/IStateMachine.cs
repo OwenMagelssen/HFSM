@@ -3,6 +3,7 @@
  * https://opticnerveinteractive.com
  ******************************************************************/
 
+using System;
 using System.Collections.ObjectModel;
 
 namespace HFSM
@@ -11,6 +12,7 @@ namespace HFSM
 	{
 		public IState iRootState { get; }
 		public IState iActiveState { get; }
+		public event Action<IState> iOnStateChanged;
 		public ReadOnlyCollection<IState> iAllStates { get; }
 		
 		public bool SetState(string stateName);

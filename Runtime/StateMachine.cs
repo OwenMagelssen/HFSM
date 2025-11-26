@@ -22,11 +22,13 @@ namespace HFSM
 			{
 				_activeState = value;
 				ActiveStateBuffer.SetBufferFromState(_activeState);
+				iOnStateChanged?.Invoke(_activeState);
 				OnStateChanged?.Invoke(_activeState);
 			}
 		}
 
 		private State<T> _activeState;
+		public event Action<IState> iOnStateChanged;
 		public event Action<State<T>> OnStateChanged;
 		public ReadOnlyCollection<IState> iAllStates => _iAllStates.AsReadOnly();
 		protected List<IState> _iAllStates = new();
