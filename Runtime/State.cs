@@ -33,10 +33,10 @@ namespace HFSM
 			StateData = stateData;
 			StateLogic = stateLogic;
 			StateLogic.Data = StateData;
-			StateMachine = stateMachine;
-			StateMachine.RegisterState(this);
 			Parent = parent;
 			Parent?.AddSubState(this);
+			StateMachine = stateMachine;
+			StateMachine.RegisterState(this);
 		}
 
 		public static int NameToID(string str)
