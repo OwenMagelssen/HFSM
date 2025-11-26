@@ -12,7 +12,6 @@ namespace HFSM
 		public string Name { get; protected set; }
 		public int Id { get; protected set; }
 		public bool Enabled { get; set; } = true;
-		public bool CanTransition { get; set; } = true;
 		public IState iParent => Parent;
 		public readonly State<T> Parent;
 		public IState iDefaultSubState => DefaultSubState;
@@ -74,7 +73,7 @@ namespace HFSM
 
 		public bool TryToTransition(out State<T> nextState)
 		{
-			if (!CanTransition)
+			if (!StateData.CanTransition)
 			{
 				nextState = null;
 				return false;

@@ -5,5 +5,8 @@
 
 namespace HFSM
 {
-	public class StateData { }
+	public class StateData
+	{
+		public bool CanTransition = true;
+	}
 }

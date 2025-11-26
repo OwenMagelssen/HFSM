@@ -10,7 +10,6 @@ namespace HFSM
 		public string Name { get; }
 		public int Id { get; }
 		public bool Enabled { get; set; }
-		public bool CanTransition { get; set; }
 		public IState iParent { get; }
 		public IState iDefaultSubState { get; }
 		public IState iActiveSubState { get; }
