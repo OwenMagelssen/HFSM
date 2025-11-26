@@ -29,9 +29,9 @@ namespace HFSM
 		private State<T> _activeState;
 		public event Action<State<T>> OnStateChanged;
 		public ReadOnlyCollection<IState> iAllStates => _iAllStates.AsReadOnly();
-		private List<IState> _iAllStates = new();
+		protected List<IState> _iAllStates = new();
 		public ReadOnlyCollection<State<T>> AllStates => _allStates.AsReadOnly();
-		private List<State<T>> _allStates = new();
+		protected List<State<T>> _allStates = new();
 		protected Dictionary<int, State<T>> StateDictionary { get; private set; } = new();
 		protected StateBuffer ActiveStateBuffer = new StateBuffer();
 		public event Action OnInitialized;
