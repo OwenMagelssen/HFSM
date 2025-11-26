@@ -9,10 +9,10 @@ namespace HFSM
 	{
 		public T Data;
 		
-		public abstract void OnEnter(State<T> previousState);
+		public virtual void OnEnter(State<T> previousState) { }
 
-		public abstract void OnExit(State<T> nextState);
+		public virtual void OnExit(State<T> nextState) { }
 
-		public abstract void OnUpdate(float deltaTime);
+		public virtual void OnUpdate(float deltaTime) { }
 	}
 }
