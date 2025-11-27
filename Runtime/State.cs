@@ -54,6 +54,11 @@ namespace HFSM
 			SubStates = _subStatesList.ToArray();
 			_subStatesList.Clear();
 			DefaultSubState = SubStates.Length > 0 ? SubStates[0] : null;
+			
+			foreach (var state in SubStates)
+			{
+				state.StateLogic.OnInitialize();
+			}
 		}
 
 		private void AddSubState(State<T> state)

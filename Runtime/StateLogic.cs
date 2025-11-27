@@ -9,6 +9,8 @@ namespace HFSM
 	{
 		public T Data;
 		
+		public virtual void OnInitialize() { }
+		
 		public virtual void OnEnter(State<T> previousState) { }
 
 		public virtual void OnExit(State<T> nextState) { }
