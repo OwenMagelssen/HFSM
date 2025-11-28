@@ -53,7 +53,6 @@ namespace HFSM
 		public void SetRootState(State<T> rootState)
 		{
 			RootState = rootState;
-			RegisterState(RootState);
 		}
 
 		public void RegisterState(State<T> state)
