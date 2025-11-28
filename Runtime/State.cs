@@ -19,6 +19,7 @@ namespace HFSM
 		public IState iActiveSubState => ActiveSubState;
 		public State<T> ActiveSubState { get; set; }
 		public readonly T StateData;
+		public readonly int Depth;
 		
 		private readonly StateLogic<T> StateLogic;
 		private readonly StateMachine<T> StateMachine;
@@ -34,7 +35,22 @@ namespace HFSM
 			StateLogic = stateLogic;
 			StateLogic.Data = StateData;
 			Parent = parent;
-			Parent?.AddSubState(this);
+			int depth = 0;
+			
+			if (Parent != null)
+			{
+				Parent.AddSubState(this);
+				depth++;
+				var s = Parent;
+				
+				while (s != null)
+				{
+					depth++;
+					s = s.Parent;
+				}
+			}
+
+			Depth = depth;
 			StateMachine = stateMachine;
 			StateMachine.RegisterState(this);
 		}
@@ -97,14 +113,13 @@ namespace HFSM
 
 		public State<T> NearestCommonAncestorWith(State<T> state)
 		{
-			State<T> a = Parent;
-			State<T> b = state.Parent;
+			State<T> a = Depth < state.Depth ? Parent : state.Parent;
+			State<T> b = Depth < state.Depth ? state : this;
 
-			while (a != null && b != null)
+			while (a != null)
 			{
-				if (a == b) return a;
+				if (a.IsAncestorOf(b)) return a;
 				a = a.Parent;
-				b = b.Parent;
 			}
 
 			return null;
