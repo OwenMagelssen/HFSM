@@ -41,6 +41,7 @@ namespace HFSM
 				return -1;
 			}
 
+			// Assembles the state buffer ordered from root to leaf
 			public void SetBufferFromState(State<T> state)
 			{
 				int count = 0;

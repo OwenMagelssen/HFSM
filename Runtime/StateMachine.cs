@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace HFSM
 {
@@ -145,7 +146,7 @@ namespace HFSM
 			// so we start with its active substate (i.e. commonAncestor index + 1)
 			int firstStateToEnter = ActiveStateBuffer.IndexOf(commonAncestor) + 1;
 
-			if (firstStateToEnter >= 0 && firstStateToEnter < ActiveStateBuffer.Count - 1)
+			if (firstStateToEnter >= 0)
 			{
 				for (int i = firstStateToEnter,  n = ActiveStateBuffer.Count; i < n; i++)
 				{
