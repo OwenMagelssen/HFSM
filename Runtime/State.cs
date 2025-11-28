@@ -76,26 +76,22 @@ namespace HFSM
 			Transitions = newTransitions;
 		}
 
-		public bool TryToTransition(out State<T> nextState)
+		public bool TryToTransition(out State<T> nextState, out Transition<T> transition)
 		{
-			if (!StateData.CanTransition)
-			{
-				nextState = null;
-				return false;
-			}
+			nextState = null;
+			transition = null;
+			if (!StateData.CanTransition) return false;
 
 			// array foreach is highly optimized
-			foreach (var transition in Transitions)
+			foreach (var t in Transitions)
 			{
-				if (!transition.DestinationState.Enabled) continue;
-				if (transition.TryTransition())
-				{
-					nextState = transition.DestinationState;
-					return true;
-				}
+				if (!t.DestinationState.Enabled) continue;
+				if (!t.TryTransition()) continue;
+				nextState = t.DestinationState;
+				transition = t;
+				return true;
 			}
 
-			nextState = null;
 			return false;
 		}
 

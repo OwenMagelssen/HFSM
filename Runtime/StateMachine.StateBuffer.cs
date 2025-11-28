@@ -63,18 +63,20 @@ namespace HFSM
 				}
 			}
 
-			public bool CheckForTransitions(out State<T> nextState)
+			public bool CheckForTransitions(out State<T> nextState, out Transition<T> transition)
 			{
 				for (int i = 0; i < Count; i++)
 				{
-					if (States[i].TryToTransition(out State<T> destinationState))
+					if (States[i].TryToTransition(out State<T> destinationState, out Transition<T> t))
 					{
 						nextState = destinationState;
+						transition = t;
 						return true;
 					}
 				}
 
 				nextState = null;
+				transition = null;
 				return false;
 			}
 

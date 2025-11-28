@@ -60,7 +60,7 @@ namespace HFSM
 		{
 			if (!StateDictionary.TryAdd(state.Id, state))
 			{
-				LogError($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
+				Log($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
 			}
 			
 			if (_allStates.Contains(state)) return;
@@ -85,7 +85,7 @@ namespace HFSM
 			if (StateDictionary.TryGetValue(id, out State<T> state))
 				return SetState(state);
 
-			LogError($"State with ID {id.ToString()} does not exist");
+			Log($"State with ID {id.ToString()} does not exist");
 			return false;
 		}
 
@@ -124,11 +124,17 @@ namespace HFSM
 						var s = ActiveStateBuffer.States[i];
 						if (!s.IsSiblingOf(fs)) continue;
 						fs.OnExit(s);
+						LogStateExit(fs);
 						foundSibling = true;
 						break;
 					}
 
-					if (!foundSibling) fs.OnExit(nextState);
+					if (!foundSibling)
+					{
+						fs.OnExit(nextState);
+						LogStateExit(fs);
+					}
+					
 					fs = fs.Parent;
 				}
 
@@ -149,10 +155,12 @@ namespace HFSM
 					if (s.Parent == null)
 					{
 						s.OnEnter(null);
+						LogStateEnter(s);
 					}
 					else
 					{
 						s.OnEnter(s.Parent.ActiveSubState);
+						LogStateEnter(s);
 						s.Parent.ActiveSubState = s;
 					}
 				}
@@ -175,8 +183,9 @@ namespace HFSM
 
 		public void Update(float deltaTime)
 		{
-			if (ActiveStateBuffer.CheckForTransitions(out State<T> nextState))
+			if (ActiveStateBuffer.CheckForTransitions(out State<T> nextState, out Transition<T> transition))
 			{
+				LogTransition(transition);
 				SetState(nextState);
 				return;
 			}
@@ -184,7 +193,13 @@ namespace HFSM
 			ActiveStateBuffer.UpdateAll(deltaTime);
 		}
 		
-		protected virtual void LogError(string error) { }
+		protected virtual void Log(string message) { }
+
+		protected virtual void LogStateEnter(State<T> state) { }
+		
+		protected virtual void LogStateExit(State<T> state) { }
+		
+		protected virtual void LogTransition(Transition<T> transition) { }
 		
 		protected virtual void OnInitialize() { }
 	}
