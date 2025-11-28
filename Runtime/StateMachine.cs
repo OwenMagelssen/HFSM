@@ -60,7 +60,7 @@ namespace HFSM
 		{
 			if (!StateDictionary.TryAdd(state.Id, state))
 			{
-				Log($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
+				Print($"Duplicate state name {state.Name} cannot be added to the StateMachine.");
 			}
 			
 			if (_allStates.Contains(state)) return;
@@ -85,7 +85,7 @@ namespace HFSM
 			if (StateDictionary.TryGetValue(id, out State<T> state))
 				return SetState(state);
 
-			Log($"State with ID {id.ToString()} does not exist");
+			Print($"State with ID {id.ToString()} does not exist");
 			return false;
 		}
 
@@ -193,7 +193,7 @@ namespace HFSM
 			ActiveStateBuffer.UpdateAll(deltaTime);
 		}
 		
-		protected virtual void Log(string message) { }
+		protected virtual void Print(string message) { }
 
 		protected virtual void LogStateEnter(State<T> state) { }
 		
